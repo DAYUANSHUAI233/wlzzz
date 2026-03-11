@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "",
-  "devCommand": "",
-  "installCommand": "pip install -r requirements-vercel.txt",
-  "framework": null,
+  "builds": null,
   "functions": {
-    "api/index.py": {
-      "runtime": "python3.9",
+    "api/**/*.py": {
       "maxDuration": 30
     }
   },
