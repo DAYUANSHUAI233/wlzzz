@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: TencentCloud-Serverless-2018-08-28
+Description: 股票市场数据中转站 - Serverless Function
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        TZ: Asia/Shanghai
+        PYTHONPATH: /opt
+
+Resources:
+  StockProxyFunction:
+    Type: TencentCloud::Serverless::Function
+    Properties:
+      FunctionName: stock-market-proxy
+      Description: 股票市场数据中转站 - 聚合多个数据源 API
+      Runtime: Python3.9
+      CodeUri: ./
+      Handler: scf_handler.handler
+      Timeout: 30
+      MemorySize: 256
+      Role: QCS_SCFExcuteRole
+      Events:
+        ApiGateway:
+          Type: APIGW
+          Properties:
+            StageName: release
+            ServiceId:
+              RequestParameters:
+                ServiceId: service-xxxxx  # 请替换为实际的 API 网关服务 ID
+            HttpMethod: ANY
+            Path: /{proxy+}
