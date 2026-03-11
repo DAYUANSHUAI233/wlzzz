@@ -169,24 +169,17 @@ https://your-repo.vercel.app
 
 ```json
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.py"
-    }
-  ],
   "functions": {
-    "api/index.py": {
+    "api/**/*.py": {
       "maxDuration": 30
     }
   },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -206,9 +199,9 @@ https://your-repo.vercel.app
 | 配置项 | 说明 | 默认值 |
 |--------|------|--------|
 | `maxDuration` | 函数最大执行时间（秒） | 30 |
-| `version` | 配置文件版本 | 2 |
-| `src` | 函数入口文件路径 | `api/index.py` |
-| `use` | 使用的构建工具 | `@vercel/python` |
+| `functions` | 函数配置对象 | 无 |
+| `rewrites` | URL 重写规则 | 无 |
+| `headers` | HTTP 头配置 | 无 |
 
 ### 修改执行时间
 
@@ -216,7 +209,7 @@ https://your-repo.vercel.app
 
 ```json
 "functions": {
-  "api/index.py": {
+  "api/**/*.py": {
     "maxDuration": 60  // 改为 60 秒
   }
 }
