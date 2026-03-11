@@ -578,14 +578,65 @@ def handle_all():
     }
     return json_response(result)
 
-# 导出 handler 给 Vercel 使用
+# Vercel Serverless Function 主入口
 def handler(event, context):
     """Vercel 兼容的入口函数"""
-    # 创建模拟的 request 对象
-    class Request:
-        def __init__(self, event):
-            self.method = event.get('httpMethod', 'GET')
-            self.path = event.get('path', '/')
+    try:
+        # 解析请求
+        method = event.get('httpMethod', 'GET')
+        path = event.get('path', '/')
 
-    request = Request(event)
-    return handler(request)
+        # 处理 CORS 预检请求
+        if method == 'OPTIONS':
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                },
+                'body': ''
+            }
+
+        # 路由分发
+        if path == '/' or path == '':
+            return handle_index()
+
+        elif path == '/plates':
+            return handle_plates()
+
+        elif path.startswith('/stocks/'):
+            plate_id = path.split('/')[-1]
+            return handle_stocks(plate_id)
+
+        elif path == '/market/updown':
+            return handle_market_updown()
+
+        elif path == '/market/retrace':
+            return handle_market_retrace()
+
+        elif path == '/market/volume':
+            return handle_market_volume()
+
+        elif path == '/market/mood':
+            return handle_market_mood()
+
+        elif path.startswith('/market/loss/'):
+            market_date = path.split('/')[-1]
+            return handle_market_loss(market_date)
+
+        elif path.startswith('/market/trend/'):
+            market_date = path.split('/')[-1]
+            return handle_market_trend(market_date)
+
+        elif path == '/market/days':
+            return handle_market_days()
+
+        elif path == '/all':
+            return handle_all()
+
+        else:
+            return json_response({'error': 'Not Found'}, 404)
+
+    except Exception as e:
+        return json_response({'error': str(e)}, 500)
